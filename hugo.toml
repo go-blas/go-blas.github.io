@@ -65,7 +65,7 @@ disableKinds = ['taxonomy', 'term', 'rss', 'sitemap', '404']
   what = "Each routine states an elementwise bound, asserted in the tests against a `math/big` oracle of 256 bits. Inside it, FMA, packing, blocking and reordered sums are all used; bit identity with netlib is not promised."
 [[params.families]]
   name = "SIMD GEMM"
-  what = "A packed, cache-blocked, multicore kernel: AVX2/FMA, NEON, VSX, LASX, RVV and the z vector facility, one micro-kernel per instruction set, generated with go-asmgen."
+  what = "A packed, cache-blocked, multicore kernel: AVX2/FMA, NEON, VSX, LASX, RVV and the z vector facility, go-asmgen micro-kernels per architecture."
 [[params.families]]
   name = "netlib, the exact option"
   what = "`github.com/go-blas/blas/netlib`: plain-Go ports of reference BLAS 3.12 in the reference's loop order and without fused multiply-add, so the results are the same on every architecture. The equality oracle of the tests; not fast."
