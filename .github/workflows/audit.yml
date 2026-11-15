@@ -1,0 +1,33 @@
+name: audit
+
+# `landingkit audit` applies the kit's rules to the PUBLISHED page, by URL.
+# It cannot run on a pull request (the page it reads is the one already
+# deployed), so it runs after each deploy, weekly, and on demand. An unreadable
+# page fails the run, never passes it.
+
+on:
+  workflow_run:
+    workflows: ["Deploy Hugo site to Pages"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: the published page matches the kit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: landingkit audit
+        env:
+          GOWORK: "off"
+        run: go run github.com/go-fleettools/landingkit/cmd/landingkit audit https://go-blas.github.io/

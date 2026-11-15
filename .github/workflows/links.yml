@@ -1,0 +1,46 @@
+name: links
+
+# Taken from go-fileshare.github.io, where a dead repository link on the
+# landing went unnoticed until a check like this one read the BUILT site.
+#
+# ⛔ THE CHECK READS THE BUILT SITE, NOT THE LAYOUTS: templated links such as
+# the per-repository cards only become real URLs once Hugo has expanded them.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: every link and image resolves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      # Hugo resolves the landingkit module (hugo.toml [module]) with the go
+      # command, at the version go.mod pins.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.169.0"
+          extended: true
+      - run: hugo --minify --destination ./public
+      # The checker is the landing kit's own, `landingkit links`, at the
+      # version go.mod pins (Renovate bumps it with the partials). It replaces
+      # an inline curl loop, and probes github.com blob links on
+      # raw.githubusercontent.com: github.com answers a program's request for a
+      # blob page with 503 most of the time. Checked on this site before the
+      # switch: every link passes, and a planted dead repository link and a
+      # dead blob link both fail it (exit 1).
+      - name: Check
+        env:
+          GOWORK: "off"
+        run: go run github.com/go-fleettools/landingkit/cmd/landingkit links public
