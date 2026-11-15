@@ -22,7 +22,7 @@
       {{ partial "cta.html" . }}
       <div class="trust"><span><b>{{ len .Site.Params.families }}</b> things it does, on one page</span><span><b>6</b> SIMD targets</span><span>argument errors returned, never panics</span></div>
     </div>
-    {{/* Lines taken verbatim from the README of go-blas/blas at v0.2.0. */}}
+    {{/* Lines taken verbatim from the README of go-blas/blas at v0.3.0. */}}
     <div class="term">
       <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">main.go</span></div>
 <pre><span class="c-cmd">import</span> <span class="c-str">"github.com/go-blas/blas"</span>
@@ -34,7 +34,7 @@ err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, 
   </div></div>
 
   <div class="strip"><div class="wrap">
-    <span class="lead-line">{{ len .Site.Params.repos }} repository — <b>the first library of the organization</b>, released as v0.1.0, now at v0.2.0</span>
+    <span class="lead-line">{{ len .Site.Params.repos }} repository — <b>the first library of the organization</b>, released as v0.1.0, now at v0.3.0</span>
     <div class="mods">{{ range .Site.Params.repos }}<a href="{{ .href }}">{{ .name }}</a>{{ end }}</div>
   </div></div>
 
@@ -53,7 +53,7 @@ err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, 
   </div></section>
 
   <section id="api" style="padding-top:10px"><div class="wrap">
-    <span class="eyebrow">What v0.2.0 offers</span>
+    <span class="eyebrow">What v0.3.0 offers</span>
     <h2>{{ len .Site.Params.families }} things, <i>the reference's names</i>.</h2>
     <div class="grid">
       {{ range .Site.Params.families }}
@@ -64,20 +64,20 @@ err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, 
 
   <section id="perf" style="padding-top:10px"><div class="wrap">
     <span class="eyebrow">Speed</span>
-    <h2>Not measured yet, <i>so not claimed</i>.</h2>
-    <p class="lead" style="max-width:none">The GEMM kernel was moved from go-ndarray, its assembly byte-identical (<a href="https://github.com/go-blas/blas/issues/1"><u>go-blas/blas#1</u></a>), but nothing has been timed here against OpenBLAS yet, so this page makes no performance claim. When the table exists, wins and losses will be on it, one core against one core.</p>
+    <h2>Measured once, <i>so claimed once</i>.</h2>
+    <p class="lead" style="max-width:none">The GEMM kernel was moved from go-ndarray, its assembly byte-identical (<a href="https://github.com/go-blas/blas/issues/1"><u>go-blas/blas#1</u></a>), but nothing has been timed here against OpenBLAS yet, so this page makes no claim against it. The one measurement there is: the level 3 routines of v0.3.0 against netlib's plain-Go ports of the reference, on cfarm420 (AMD EPYC 7773X, one core, <code>GOMAXPROCS=1</code>), <b>one run</b>, no interval. At n = 512 in float64, trsm and trmm ran at about 10 and 12 Gflop/s against 2.3 and 2.5 for netlib, syrk, syr2k and symm at 21, 23 and 30 against 1.9, 2.8 and 3.2; the table, with float32, is in <a href="https://github.com/go-blas/blas/blob/v0.3.0/docs/design.md"><u>docs/design.md</u></a>. When a table against OpenBLAS exists, wins and losses will be on it, one core against one core.</p>
   </div></section>
 
   <section id="next" style="padding-top:10px"><div class="wrap">
     <span class="eyebrow">Next</span>
-    <h2>What is planned after <i>v0.2.0</i>.</h2>
+    <h2>What is planned after <i>v0.3.0</i>.</h2>
     <p class="lead" style="max-width:none">Planned, not built: the plan was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a>.</p>
     <div class="grid">
-      <div class="card"><h3>Level 3</h3><p>The rest of level 3, <code>trsm</code>, <code>trmm</code>, <code>syrk</code>, <code>syr2k</code> and <code>symm</code> for <code>s</code> and <code>d</code>, is written and in review (<a href="https://github.com/go-blas/blas/pull/4"><u>go-blas/blas#4</u></a>), blocked on the packed GEMM; julia needs <code>trsm</code> and <code>syrk</code> first, for <code>\</code> and as the building blocks of <code>getrf</code> and <code>potrf</code>. Not released yet.</p></div>
+      <div class="card"><h3>Level 3 beyond the product: released</h3><p><code>trsm</code>, <code>trmm</code>, <code>syrk</code>, <code>syr2k</code> and <code>symm</code> for <code>s</code> and <code>d</code> are in v0.3.0 (<a href="https://github.com/go-blas/blas/pull/4"><u>go-blas/blas#4</u></a>), blocked on the packed GEMM. They are what julia needed first, <code>trsm</code> and <code>syrk</code>, for <code>\</code> and as the building blocks of the <code>getrf</code> and <code>potrf</code> that come next.</p></div>
       <div class="card"><h3>LAPACK</h3><p><code>getrf</code>, <code>potrf</code>, <code>geqrf</code> and the routines around them, under the same naming and error conventions.</p></div>
       <div class="card"><h3>Complex types</h3><p>The <code>c</code> and <code>z</code> routines (<code>Cgemm</code>, <code>Zgemm</code>, <code>Zgemv</code>, <code>Zdotc</code>/<code>Zdotu</code>) on <code>complex64</code> and <code>complex128</code> slices, added without breaking the real API.</p></div>
     </div>
-    <p class="lead" style="max-width:none;margin-top:22px">The design was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a> and is recorded in <a href="https://github.com/go-blas/blas/blob/v0.2.0/docs/design.md"><u>docs/design.md</u></a>. Julia binds it through libblastrampoline (<a href="https://github.com/go-embedded-julia/julia/issues/67"><u>go-embedded-julia/julia#67</u></a>), and go-ndarray will consume it in a later pull request.</p>
+    <p class="lead" style="max-width:none;margin-top:22px">The design was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a> and is recorded in <a href="https://github.com/go-blas/blas/blob/v0.3.0/docs/design.md"><u>docs/design.md</u></a>. Julia binds it through libblastrampoline (<a href="https://github.com/go-embedded-julia/julia/issues/67"><u>go-embedded-julia/julia#67</u></a>), and go-ndarray will consume it in a later pull request.</p>
   </div></section>
 
   <section id="repos" style="padding-top:20px"><div class="wrap">
