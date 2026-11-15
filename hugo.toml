@@ -19,7 +19,7 @@ disableKinds = ['taxonomy', 'term', 'rss', 'sitemap', '404']
     path = "github.com/go-fleettools/landingkit"
 
 [params]
-  description = "go-blas is a pure-Go BLAS with the Fortran reference signatures, column-major: real (float32/float64) level 1, gemv and gemm, a SIMD GEMM on six architectures, an error bound stated per routine and checked against a 256-bit oracle, and a netlib-exact option. Argument errors are returned, never panics."
+  description = "go-blas is a pure-Go BLAS with the Fortran reference signatures, column-major: real (float32/float64) level 1, gemv and gemm (with a general-stride form), the rest of level 3 in review, a SIMD GEMM on six architectures, an error bound stated per routine and checked against a 256-bit oracle, and a netlib-exact option. Argument errors are returned, never panics."
 
 # The hero's buttons: rendered by the kit's cta.html, in the kit's order.
 # There is no documentation site yet, so the source is the primary reading.
@@ -29,14 +29,14 @@ disableKinds = ['taxonomy', 'term', 'rss', 'sitemap', '404']
   label = "Read the source on GitHub"
 [[params.cta]]
   kind  = "link"
-  href  = "https://github.com/go-blas/blas/blob/v0.1.0/docs/design.md"
+  href  = "https://github.com/go-blas/blas/blob/v0.2.0/docs/design.md"
   label = "Read the design"
 
 [[params.repos]]
   name  = "blas"
-  kind  = "library · v0.1.0"
+  kind  = "library · v0.2.0"
   href  = "https://github.com/go-blas/blas"
-  blurb = "The library. Real-type BLAS with the Fortran reference signatures, column-major: <code>Dgemm</code>/<code>Sgemm</code>, <code>Dgemv</code>/<code>Sgemv</code> and level 1, each returning an <code>error</code>. <code>Dgemm</code> and <code>Sgemm</code> run on a packed, cache-blocked, multicore SIMD kernel; package <code>netlib</code> has the same routines as plain-Go ports of reference BLAS 3.12."
+  blurb = "The library. Real-type BLAS with the Fortran reference signatures, column-major: <code>Dgemm</code>/<code>Sgemm</code>, <code>Dgemv</code>/<code>Sgemv</code> and level 1, each returning an <code>error</code>; v0.2.0 added <code>HasSgemmKernel</code> and <code>DgemmStrided</code>/<code>SgemmStrided</code>. <code>Dgemm</code> and <code>Sgemm</code> run on a packed, cache-blocked, multicore SIMD kernel; package <code>netlib</code> has the same routines as plain-Go ports of reference BLAS 3.12. The rest of level 3 (trsm, trmm, syrk, syr2k, symm) is in review, <a href=\"https://github.com/go-blas/blas/pull/4\">go-blas/blas#4</a>, and not released."
 
 # No [params.brand]: there is no go-blas/brand repository and no logo yet, so
 # the page uses the kit's neutral defaults. The brand block is READ from a
@@ -47,7 +47,10 @@ disableKinds = ['taxonomy', 'term', 'rss', 'sitemap', '404']
 # from a number typed beside it.
 [[params.families]]
   name = "Level 3"
-  what = "`Dgemm` and `Sgemm`: `C := alpha*op(A)*op(B) + beta*C` with every transpose combination, leading dimensions, and the reference's scalar rules (`beta = 0` never reads C, `alpha = 0` never reads A or B)."
+  what = "`Dgemm` and `Sgemm`: `C := alpha*op(A)*op(B) + beta*C` with every transpose combination, leading dimensions, and the reference's scalar rules (`beta = 0` never reads C, `alpha = 0` never reads A or B). Not yet released, in review as [go-blas/blas#4](https://github.com/go-blas/blas/pull/4): `Dtrsm`/`Strsm`, `Dtrmm`/`Strmm`, `Dsyrk`/`Ssyrk`, `Dsyr2k`/`Ssyr2k` and `Dsymm`/`Ssymm`, blocked on the same packed GEMM."
+[[params.families]]
+  name = "General strides"
+  what = "`DgemmStrided` and `SgemmStrided` (v0.2.0): the product with a row and a column stride per operand, as BLIS's `bli_?gemm`, so a transposed or sliced view is multiplied without copying it first. `HasSgemmKernel()` reports whether `Sgemm` runs on a SIMD kernel on this CPU."
 [[params.families]]
   name = "Level 2"
   what = "`Dgemv` and `Sgemv`, with increments, negative ones included."
