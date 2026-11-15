@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .Site.Title }} — pure-Go BLAS</title>
+<meta name="description" content="{{ .Site.Params.description }}">
+{{ partial "styles.html" . }}
+</head>
+<body class="lm">
+  <header class="nav"><div class="wrap">
+    <a class="brand" href="/">go-blas</a>
+    <nav><a href="#features">Why</a><a href="#api">API</a><a href="#next">Next</a><a href="#repos">Repositories</a></nav>
+    {{ partial "theme-toggle.html" . }}
+  </div></header>
+  {{ partial "fork-ribbon.html" "https://github.com/go-blas/blas" }}
+
+  <div class="hero"><div class="wrap">
+    <div>
+      <h1 class="head">BLAS in Go, with the Fortran signatures.<br><span class="accent">Column-major, SIMD, an error bound.</span></h1>
+      <p class="sub"><b>go-blas</b> is the reference BLAS for Go: real (<code>float32</code>/<code>float64</code>) level 1, <code>gemv</code> and <code>gemm</code>, parameter for parameter as in Fortran, so that a Fortran ABI shim can call it exactly. <code>Dgemm</code> and <code>Sgemm</code> run on a SIMD kernel on six architectures, every routine states its error bound and checks it against a 256-bit oracle, and a bad argument is an <code>error</code>, never a panic.</p>
+      {{ partial "cta.html" . }}
+      <div class="trust"><span><b>{{ len .Site.Params.families }}</b> things it does, on one page</span><span><b>6</b> SIMD targets</span><span><b>0</b> panics on a bad argument</span></div>
+    </div>
+    {{/* Lines taken verbatim from the README of go-blas/blas at v0.1.0. */}}
+    <div class="term">
+      <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">main.go</span></div>
+<pre><span class="c-cmd">import</span> <span class="c-str">"github.com/go-blas/blas"</span>
+
+<span class="c-com">// C := alpha*op(A)*op(B) + beta*C, column-major, as DGEMM. a is m x k, b is</span>
+<span class="c-com">// k x n, c is m x n, with leading dimensions lda, ldb, ldc.</span>
+err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, ldc)</pre>
+    </div>
+  </div></div>
+
+  <div class="strip"><div class="wrap">
+    <span class="lead-line">{{ len .Site.Params.repos }} repository — <b>the first library of the organization</b>, released as v0.1.0</span>
+    <div class="mods">{{ range .Site.Params.repos }}<a href="{{ .href }}">{{ .name }}</a>{{ end }}</div>
+  </div></div>
+
+  <section id="features"><div class="wrap">
+    <span class="eyebrow">Why go-blas</span>
+    <h2>The BLAS Fortran code expects, <i>in Go</i>.</h2>
+    <p class="lead">Numerical code that is written against BLAS expects the reference's conventions: column-major storage, leading dimensions, increments, the scalar rules and quick returns. go-blas keeps them all, so a caller written for netlib gets the same call and the same semantics. What it adds is a contract stated as a number: each routine's error is bounded elementwise and the bound is asserted in the tests, not assumed.</p>
+    <div class="grid" id="quality">
+      <div class="card"><div class="ico">📐</div><h3>Reference signatures</h3><p>One routine per Fortran routine, with the <code>s</code>/<code>d</code> prefix convention (<code>Dgemm</code>, <code>Sgemv</code>, <code>Idamax</code>). <code>beta = 0</code> never reads C, and <code>alpha = 0</code> never reads A or B.</p></div>
+      <div class="card"><div class="ico">🎯</div><h3>An error bound, not bit identity</h3><p>For <code>Dgemm</code>, elementwise, <code>|Ĉ − C| ≤ γ<sub>k+2</sub> (|α||op(A)||op(B)| + |β||C|)</code>, asserted against a <code>math/big</code> oracle of 256 bits. FMA, blocking and reordered sums are used inside it.</p></div>
+      <div class="card"><div class="ico">🛡️</div><h3>No routine panics</h3><p>A bad argument comes back as a <code>*blas.ArgError</code> with xerbla's parameter number. A slice shorter than the call needs is reported against its own parameter, also on 32-bit targets.</p></div>
+      <div class="card"><div class="ico">⚡</div><h3>SIMD GEMM on six architectures</h3><p>AVX2/FMA, NEON, VSX, LASX, RVV and the z vector facility, moved from <a href="https://github.com/go-ndarray/ndarray"><u>go-ndarray/ndarray</u></a>. The column-major product is the row-major product <code>C<sup>T</sup> = op(B)<sup>T</sup> op(A)<sup>T</sup></code>, so one strided kernel serves both layouts.</p></div>
+      <div class="card"><div class="ico">🧮</div><h3>The exact option</h3><p>Package <code>netlib</code> is reference BLAS 3.12 in plain Go, in the reference's loop order and without FMA. Callers who need netlib's exact rounding use it.</p></div>
+      <div class="card"><div class="ico">🧪</div><h3>Tests that bite</h3><p>A fuzz target per routine with a committed corpus, 100% block coverage, and a tool that disables each argument guard in turn and requires an assertion to fail.</p></div>
+    </div>
+  </div></section>
+
+  <section id="api" style="padding-top:10px"><div class="wrap">
+    <span class="eyebrow">What v0.1.0 offers</span>
+    <h2>{{ len .Site.Params.families }} things, <i>the reference's names</i>.</h2>
+    <div class="grid">
+      {{ range .Site.Params.families }}
+      <div class="card"><h3>{{ .name }}</h3><p>{{ .what | markdownify }}</p></div>
+      {{ end }}
+    </div>
+  </div></section>
+
+  <section id="perf" style="padding-top:10px"><div class="wrap">
+    <span class="eyebrow">Speed</span>
+    <h2>Not measured yet, <i>so not claimed</i>.</h2>
+    <p class="lead" style="max-width:none">The GEMM kernel is the one go-ndarray measures, but nothing has been timed here against OpenBLAS yet, so this page makes no performance claim. When the table exists, wins and losses will be on it, one core against one core.</p>
+  </div></section>
+
+  <section id="next" style="padding-top:10px"><div class="wrap">
+    <span class="eyebrow">Next</span>
+    <h2>What comes after <i>v0.1.0</i>.</h2>
+    <div class="grid">
+      <div class="card"><h3>Level 3</h3><p>The rest of level 3 beyond the product.</p></div>
+      <div class="card"><h3>LAPACK</h3><p><code>getrf</code>, <code>potrf</code>, <code>geqrf</code> and the routines around them, under the same naming and error conventions.</p></div>
+      <div class="card"><h3>Complex types</h3><p>The <code>c</code> and <code>z</code> routines (<code>Cgemm</code>, <code>Zgemm</code>, <code>Zgemv</code>, <code>Zdotc</code>/<code>Zdotu</code>) on <code>complex64</code> and <code>complex128</code> slices, added without breaking the real API.</p></div>
+    </div>
+    <p class="lead" style="max-width:none;margin-top:22px">The design was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a> and is recorded in <a href="https://github.com/go-blas/blas/blob/v0.1.0/docs/design.md"><u>docs/design.md</u></a>. Julia binds it through libblastrampoline (<a href="https://github.com/go-embedded-julia/julia/issues/67"><u>go-embedded-julia/julia#67</u></a>), and go-ndarray will consume it in a later pull request.</p>
+  </div></section>
+
+  <section id="repos" style="padding-top:20px"><div class="wrap">
+    <span class="eyebrow">Repositories</span>
+    <h2>What is here.</h2>
+    <div class="road">
+      {{ range .Site.Params.repos }}
+      <div class="ph">
+        <div class="top"><h4><a href="{{ .href }}">{{ .name }}</a></h4><span class="tag active">{{ .kind }}</span></div>
+        <p>{{ .blurb | safeHTML }}</p>
+      </div>
+      {{ end }}
+    </div>
+  </div></section>
+
+  <section id="eco" style="padding-top:6px"><div class="wrap">
+    <div class="band">
+      <h2>The BLAS that Fortran callers expect, written in Go.</h2>
+      <p>Reference signatures, column-major, a SIMD GEMM on six architectures, and an error bound you can read in the tests. Complex types and LAPACK are next; speed against OpenBLAS is not measured yet.</p>
+      <a class="btn btn-ghost" href="https://github.com/go-blas/blas">{{ partial "icons/github.html" . }}Read the source on GitHub →</a>
+    </div>
+  </div></section>
+
+  <footer><div class="wrap"><span>go-blas · <a href="https://github.com/go-blas">go-blas on GitHub</a>{{ if not (partial "mantra-on.html" .) }} · BSD-3-Clause{{ end }}</span></div></footer>
+</body>
+</html>
