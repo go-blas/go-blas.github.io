@@ -74,7 +74,7 @@ err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, 
     <p class="lead" style="max-width:none">Planned, not built: the plan was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a>.</p>
     <div class="grid">
       <div class="card"><h3>Level 3 beyond the product: released</h3><p><code>trsm</code>, <code>trmm</code>, <code>syrk</code>, <code>syr2k</code> and <code>symm</code> for <code>s</code> and <code>d</code> are in v0.3.0 (<a href="https://github.com/go-blas/blas/pull/4"><u>go-blas/blas#4</u></a>), blocked on the packed GEMM. They are what julia needed first, <code>trsm</code> and <code>syrk</code>, for <code>\</code> and as the building blocks of the <code>getrf</code> and <code>potrf</code> that come next.</p></div>
-      <div class="card"><h3>LAPACK</h3><p><code>getrf</code>, <code>potrf</code>, <code>geqrf</code> and the routines around them, under the same naming and error conventions.</p></div>
+      <div class="card"><h3>LAPACK: LU and Cholesky, unreleased</h3><p>Package <code>lapack</code> has <code>getrf</code>, <code>getrs</code>, <code>potrf</code> and <code>potrs</code> for <code>s</code> and <code>d</code> (in review: <a href="https://github.com/go-blas/blas/pull/6"><u>go-blas/blas#6</u></a>), in no release yet: reference signatures, a positive <code>info</code> returned as a result, a backward-error bound per routine asserted against the 256-bit oracle. <code>geqrf</code> and the routines around them come next, under the same naming and error conventions.</p></div>
       <div class="card"><h3>Complex types</h3><p>The <code>c</code> and <code>z</code> routines (<code>Cgemm</code>, <code>Zgemm</code>, <code>Zgemv</code>, <code>Zdotc</code>/<code>Zdotu</code>) on <code>complex64</code> and <code>complex128</code> slices, added without breaking the real API.</p></div>
     </div>
     <p class="lead" style="max-width:none;margin-top:22px">The design was agreed on <a href="https://github.com/go-embedded-ruby/ruby/issues/918"><u>go-embedded-ruby/ruby#918</u></a> and is recorded in <a href="https://github.com/go-blas/blas/blob/v0.3.0/docs/design.md"><u>docs/design.md</u></a>. Julia binds it through libblastrampoline (<a href="https://github.com/go-embedded-julia/julia/issues/67"><u>go-embedded-julia/julia#67</u></a>), and go-ndarray will consume it in a later pull request.</p>
@@ -96,7 +96,7 @@ err := blas.Dgemm(blas.NoTrans, blas.NoTrans, m, n, k, 1, a, lda, b, ldb, 0, c, 
   <section id="eco" style="padding-top:6px"><div class="wrap">
     <div class="band">
       <h2>The BLAS that Fortran callers expect, written in Go.</h2>
-      <p>Reference signatures, column-major, a SIMD GEMM on six architectures, and an error bound you can read in the tests. Complex types and LAPACK are next; speed against OpenBLAS is not measured yet.</p>
+      <p>Reference signatures, column-major, a SIMD GEMM on six architectures, and an error bound you can read in the tests. LU and Cholesky are in review (unreleased); complex types and the rest of LAPACK are next; speed against OpenBLAS is not measured yet.</p>
       <a class="btn btn-ghost" href="https://github.com/go-blas/blas">{{ partial "icons/github.html" . }}Read the source on GitHub →</a>
     </div>
   </div></section>
